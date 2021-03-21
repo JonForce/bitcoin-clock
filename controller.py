@@ -10,7 +10,7 @@ class Controller:
     UPDATE_FREQUENCY = 2000 # millis
     STORE_BTC_PRICE_FREQUENCY = 60 # seconds
     OLDEST_ALLOWED_PRICE = 60*60*24 # seconds
-    GIF_DURATION = 10 # seconds
+    GIF_DURATION = 60 # seconds
     prices = []
 
     def __init__(self, gif_manager, clock_window):
