@@ -3,13 +3,14 @@ from PyQt5.QtGui import QMovie, QFont
 
 
 class ClockWindow(object):
-    WIDTH = 800
-    HEIGHT = 480
-    RATIO = WIDTH / HEIGHT
 
-    def __init__(self, MainWindow):
+
+    def __init__(self, MainWindow, width, height):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(self.WIDTH, self.HEIGHT)
+        dim = MainWindow.size()
+        self.WIDTH = width
+        self.HEIGHT = height
+        self.RATIO = self.WIDTH / self.HEIGHT
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
 

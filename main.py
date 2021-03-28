@@ -19,11 +19,12 @@ if __name__ == '__main__':
 
     app = QtWidgets.QApplication(sys.argv)
     window = QtWidgets.QMainWindow()
-    ui = ClockWindow(window)
+    window.showFullScreen()
+    ui = ClockWindow(window, app.primaryScreen().size().width(), app.primaryScreen().size().height())
     window.show()
 
     ui.update_gif(gif_manager.random_idling_gif())
 
-    controller = Controller(gif_manager, ui)
+    controller = Controller(gif_manager, ui, CONFIG)
 
     sys.exit(app.exec_())

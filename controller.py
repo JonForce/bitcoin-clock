@@ -1,8 +1,10 @@
 import requests
+import configparser
 from datetime import datetime
 from datetime import timedelta
 from PyQt5.QtCore import QTimer,QDateTime
 from PyQt5.QtCore import QThread
+import random
 
 
 class Controller:
@@ -13,7 +15,32 @@ class Controller:
     GIF_DURATION = 60 # seconds
     prices = []
 
-    def __init__(self, gif_manager, clock_window):
+    gif_search_terms_positive = {
+        "to the moon": 5,
+        "money": 5,
+        "rich": 5,
+        "bitcoin": 5,
+        "bullish": 2,
+        "printing money": 4,
+        "success": 3,
+        "unstoppable": 2,
+        "happy": 3
+    }
+    terms_positive_sum = None
+
+    gif_search_terms_negative = {
+        "cry": 5,
+        "diamond hands": 5,
+        "car crash": 2,
+        "crash": 3,
+        "burning money": 5,
+        "hold!": 8,
+        "danny devito": 1
+    }
+    terms_negative_sum = None
+
+    def __init__(self, gif_manager, clock_window, config):
+        self.config = config
         self.gif_manager = gif_manager
         self.clock_window = clock_window
         self.gif_start_time = datetime.now()
@@ -32,8 +59,12 @@ class Controller:
         self.clock_window.set_display_text(text, "green" if self._percent_change() >= 0 else "red")
 
         if self._gif_duration() > self.GIF_DURATION:
-            query = "to the moon" if self._percent_change() >= 0 else "diamond hands"
-            self.clock_window.update_gif(self.gif_manager.grab_gif(query))
+            term = None
+            if self._percent_change() >= 0 or self.config['DEFAULT']['HAPPY_MODE'] == "True":
+                term = self._random_positive_term()
+            else:
+                term = self._random_negative_term()
+            self.clock_window.update_gif(self.gif_manager.grab_gif(term))
             self.gif_start_time = datetime.now()
             print("Updating gif")
 
@@ -76,3 +107,27 @@ class Controller:
 
     def _gif_duration(self):
             return self._elapsed(self.gif_start_time)
+
+    def _random_positive_term(self):
+        if self.terms_positive_sum is None:
+            self.terms_positive_sum = 0
+            for term in self.gif_search_terms_positive.keys():
+                self.terms_positive_sum += self.gif_search_terms_positive[term]
+        select_i = random.randint(0, self.terms_positive_sum - 1)
+        for term in self.gif_search_terms_positive.keys():
+            if select_i <= self.gif_search_terms_positive[term]:
+                return term
+            else:
+                select_i -= self.gif_search_terms_positive[term]
+
+    def _random_negative_term(self):
+        if self.terms_negative_sum is None:
+            self.terms_negative_sum = 0
+            for term in self.gif_search_terms_negative.keys():
+                self.terms_negative_sum += self.gif_search_terms_negative[term]
+        select_i = random.randint(0, self.terms_negative_sum - 1)
+        for term in self.gif_search_terms_negative.keys():
+            if select_i <= self.gif_search_terms_negative[term]:
+                return term
+            else:
+                select_i -= self.gif_search_terms_negative[term]
