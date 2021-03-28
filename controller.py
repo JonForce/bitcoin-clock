@@ -55,8 +55,11 @@ class Controller:
         print("Refresh")
         self.timer.start(self.UPDATE_FREQUENCY)
         self._update_btc_price()
-        text = f"${self.btc_price['str']} ({round(self._percent_change()*100, ndigits=2)}%)"
-        self.clock_window.set_display_text(text, "green" if self._percent_change() >= 0 else "red")
+        if self.config['DEFAULT']['HAPPY_MODE'] != "True" or self._percent_change() >= 0:
+            text = f"${self.btc_price['str']} ({round(self._percent_change()*100, ndigits=2)}%)"
+            self.clock_window.set_display_text(text, "green" if self._percent_change() >= 0 else "red")
+        else:
+            self.clock_window.set_display_text("Have a great day!", "green")
 
         if self._gif_duration() > self.GIF_DURATION:
             term = None
