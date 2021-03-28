@@ -55,7 +55,7 @@ class Controller:
         print("Refresh")
         self.timer.start(self.UPDATE_FREQUENCY)
         self._update_btc_price()
-        if self.config['DEFAULT']['HAPPY_MODE'] != "True" or self._percent_change() >= 0:
+        if (self.config['DEFAULT']['HAPPY_MODE'] != "True" or self._percent_change() >= 0) and self.btc_price is not None:
             text = f"${self.btc_price['str']} ({round(self._percent_change()*100, ndigits=2)}%)"
             self.clock_window.set_display_text(text, "green" if self._percent_change() >= 0 else "red")
         else:
@@ -76,7 +76,12 @@ class Controller:
 
 
     def _update_btc_price(self):
-        response = requests.get('https://api.coindesk.com/v1/bpi/currentprice.json')
+        try:
+            response = requests.get('https://api.coindesk.com/v1/bpi/currentprice.json')
+        except:
+            print("No internet")
+            self.btc_price = None
+            return
         price = {
             "time": datetime.now(),
             "float": float(response.json()["bpi"]["USD"]["rate"].replace(",", "")),
@@ -100,6 +105,9 @@ class Controller:
 
     # Default to the percent change in the last hour
     def _percent_change(self, duration=60*60):
+        if self.btc_price is None:
+            return 0
+
         closest_price = None
         target_time = datetime.now() - timedelta(seconds=duration)
         for price in self.prices:
