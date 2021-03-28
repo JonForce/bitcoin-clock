@@ -60,11 +60,14 @@ class Controller:
 
         if self._gif_duration() > self.GIF_DURATION:
             term = None
-            if self._percent_change() >= 0 or self.config['DEFAULT']['HAPPY_MODE'] == "True":
+            if self._percent_change() >= 0:
                 term = self._random_positive_term()
             else:
                 term = self._random_negative_term()
-            self.clock_window.update_gif(self.gif_manager.grab_gif(term))
+            if self._percent_change() < 0 and self.config['DEFAULT']['HAPPY_MODE'] == "True":
+                self.clock_window.update_gif(self.gif_manager.random_idling_gif(self))
+            else:
+                self.clock_window.update_gif(self.gif_manager.grab_gif(term))
             self.gif_start_time = datetime.now()
             print("Updating gif")
 
